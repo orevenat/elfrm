@@ -2,18 +2,26 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-use Framework\Http\Request;
+use Framework\Http\RequestFactory;
+use Framework\Http\Response;
 
 chdir(dirname(__DIR__));
 require('vendor/autoload.php');
 
 
 ### Initialization
-$request = (new Request())
-    ->withQueryParams($_GET)
-    ->withParsedBody($_POST);
+$request = RequestFactory::fromGlobals();
 
 ### Action
 $name = $request->getQueryParams()['name'] ?? 'Guest';
 
-echo 'Hello, ' . $name . '!';
+$response = (new Response('Hello, ' . $name . '!'))
+    ->withHeader('X-Developer', 'orevenat');
+
+### Sending
+
+header('HTTP/1.0 ' . $response->getStatusCode() . ' ' . $response->getReasonPhrase());
+foreach ($response->getHeaders() as $name => $value) {
+    header($name . ':' . $value);
+}
+echo $response->getBody();
