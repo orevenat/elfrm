@@ -2,8 +2,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-use Framework\Http\ResponseSender;
 use Zend\Diactoros\Response\HtmlResponse;
+use Zend\HttpHandlerRunner\Emitter\SapiEmitter;
 use Zend\Diactoros\ServerRequestFactory;
 
 chdir(dirname(__DIR__));
@@ -21,5 +21,5 @@ $response = (new HtmlResponse('Hello, ' . $name . '!'))
 
 ### Sending
 
-$emitter = new ResponseSender();
-$emitter->send($response);
+$emitter = new SapiEmitter();
+$emitter->emit($response);
