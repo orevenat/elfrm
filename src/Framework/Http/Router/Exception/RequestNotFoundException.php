@@ -2,7 +2,7 @@
 
 namespace Framework\Http\Router\Exception;
 
-class RouteNotFoundException extends \LogicException
+class RequestNotFoundException extends \LogicException
 {
     private $name;
     private $params;

@@ -2,7 +2,7 @@
 
 namespace Test\Framework\Http;
 
-use Framework\Http\Router\Exception\RouteNotMatchedException;
+use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Framework\Http\Router\RouteCollection;
 use Framework\Http\Router\Router;
 use PHPUnit\Framework\TestCase;
@@ -16,23 +16,29 @@ class RouterTest extends TestCase
         $routes = new RouteCollection();
 
         $routes->get($nameGet = 'blog', '/blog', $handlerGet = 'handler_get');
-        $routes->post($namePost = 'blog_edit', '/blog', $handerPost = 'handler_post');
+        $routes->post($namePost = 'blog_edit', '/blog', $handlerPost = 'handler_post');
 
         $router = new Router($routes);
 
         $result = $router->match($this->buildRequest('GET', '/blog'));
         self::assertEquals($nameGet, $result->getName());
-        self::assertEquals($handerPost, $result->getHandler());
+        self::assertEquals($handlerGet, $result->getHandler());
+
+        $result = $router->match($this->buildRequest('POST', '/blog'));
+        self::assertEquals($namePost, $result->getName());
+        self::assertEquals($handlerPost, $result->getHandler());
     }
 
     public function testMissingMethod()
     {
         $routes = new RouteCollection();
 
-        $routes = new Router($routes);
+        $routes->post('blog', '/blog', 'handler_post');
 
-        $this->expectException(RouteNotMatchedException::class);
-        $routes->match($this->buildRequest('DELETE', '/blog'));
+        $router = new Router($routes);
+
+        $this->expectException(RequestNotMatchedException::class);
+        $router->match($this->buildRequest('DELETE', '/blog'));
     }
 
     public function testCorrectAttributes()
@@ -43,7 +49,7 @@ class RouterTest extends TestCase
 
         $router = new Router($routes);
 
-        $result = $router->match($this->buildRequest('GET', 'blog/5'));
+        $result = $router->match($this->buildRequest('GET', '/blog/5'));
 
         self::assertEquals($name, $result->getName());
         self::assertEquals(['id' => '5'], $result->getAttributes());
@@ -57,7 +63,7 @@ class RouterTest extends TestCase
 
         $router = new Router($routes);
 
-        $this->expectException(RouteNotMatchedException::class);
+        $this->expectException(RequestNotMatchedException::class);
         $router->match($this->buildRequest('GET', 'blog/slug'));
     }
 

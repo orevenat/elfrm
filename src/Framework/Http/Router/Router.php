@@ -3,7 +3,7 @@
 namespace Framework\Http\Router;
 
 use Framework\Http\Router\Exception\RequestNotMatchedException;
-use Framework\Http\Router\Exception\RouteNotFoundException;
+use Framework\Http\Router\Exception\RequestNotFoundException;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Router
@@ -22,7 +22,7 @@ class Router
                 continue;
 
             $pattern = preg_replace_callback('~\{([^\}]+)\}~',function ($matches) use ($route) {
-                $arguments = $matches[1];
+                $argument = $matches[1];
                 $replace = $route->tokens[$argument] ?? '[^}]+';
                 return '(?P<' . $argument . '>' . $replace . ')';
             }, $route->pattern);
@@ -49,7 +49,7 @@ class Router
                 continue;
             }
 
-            $url = preg_replace_callback('~\{([^\}]+)\}~', function ($matches) use ($route) {
+            $url = preg_replace_callback('~\{([^\}]+)\}~', function ($matches) use (&$arguments) {
                 $argument = $matches[1];
                 if (!array_key_exists($argument, $arguments)) {
                     throw new \InvalidArgumentException('Mising parameter "' . $argument . '"');
@@ -62,6 +62,6 @@ class Router
             }
         }
 
-        throw new RouteNotFoundException($name, $params);
+        throw new RequestNotFoundException($name, $params);
     }
 }

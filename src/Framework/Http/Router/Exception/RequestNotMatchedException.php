@@ -4,7 +4,7 @@ namespace Framework\Http\Router\Exception;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-class RouteNotMatchedException extends \LogicException
+class RequestNotMatchedException extends \LogicException
 {
     private $request;
 
